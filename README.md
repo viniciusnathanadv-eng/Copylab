@@ -7,37 +7,39 @@
 
 ## O que faz
 
-* Lê o PDF aberto na aba atual e extrai os resultados dos exames.
-* Converte para abreviações editáveis (Hb, Ht, Leuco, Plaq, Glic, Cr, TSH, EAS, UROC, EPF…).
-* Resume urina rotina, urocultura (com antibiograma) e parasitológico de fezes.
-* Copia o texto para a área de transferência e mostra de onde veio cada valor, para conferência.
-* Laudos testados: **Hermes Pardini, Pretti, Prestlab e Diagnóstico do Brasil**.
-* Se o leitor de PDF não funcionar no seu navegador, use **"Colar texto do PDF"** (Ctrl+A, Ctrl+C no PDF e Ctrl+V na extensão).
+- Lê o PDF aberto na aba atual e extrai os resultados dos exames.
+- Converte para abreviações editáveis (Hb, Ht, Leuco, Plaq, Glic, Cr, TSH, EAS, UROC, EPF…).
+- Resume urina rotina, urocultura (com antibiograma) e parasitológico de fezes.
+- Copia o texto para a área de transferência e mostra de onde veio cada valor, para conferência.
+- Laudos testados: **Hermes Pardini, Pretti, Prestlab e Diagnóstico do Brasil**.
+- Se o leitor de PDF não funcionar no seu navegador, use **"Colar texto do PDF"** (Ctrl+A, Ctrl+C no PDF e Ctrl+V na extensão).
 
 ## Privacidade
 
 Tudo roda **localmente no seu navegador**. A extensão não envia PDFs nem dados de pacientes para nenhum servidor.
 Mesmo assim, **não publique laudos reais** (nem prints) em issues, fóruns ou neste repositório.
 
+## Qual pasta usar?
+
+| Seu navegador | Pasta | Manifest |
+|---|---|---|
+| **Chrome, Edge, Brave** atuais | `extensao-exames` | V3 |
+| **Cent Browser 4.x**, Chromium 86 e outros antigos | `extensao-exames-antigo` | V2 |
+
+O código é o mesmo; muda só o arquivo `manifest.json`. O Chrome atual não carrega mais extensões em manifest V2,
+e o Chromium 86 não entende manifest V3, por isso existem as duas pastas.
+Não sabe qual é o seu? Abra `chrome://version` (ou `cent://version`): se o número depois de "Chrome/" for menor que 120, use a pasta `-antigo`.
+
 ## Instalação
 
 1. Baixe o arquivo `.zip` na aba **Releases** (ou em **Code → Download ZIP**) e descompacte.
 2. Abra a página de extensões: `chrome://extensions`, `edge://extensions` ou `cent://extensions`.
 3. Ative o **Modo do desenvolvedor**.
-4. Clique em **Carregar sem compactação** e escolha a pasta `extensao-exames`.
+4. Clique em **Carregar sem compactação** e escolha a pasta certa (veja a tabela acima).
 5. Para PDFs salvos no computador (`file://`), abra os **Detalhes** da extensão e ative **Permitir acesso a URLs de arquivo**.
 6. Abra o laudo, clique no ícone do CopyLab e use **Ctrl+V** onde quiser colar.
 
 Em **Opções** é possível editar o dicionário de abreviações e o separador entre resultados.
-
-## Compatibilidade
-
-|Versão|Manifest|Navegadores|
-|-|-|-|
-|0.9.1 (esta)|V2|Chromium 86+ (Cent Browser 4.x, Chrome/Edge antigos)|
-|0.9.0|V3|Chrome/Edge atuais|
-
-O Chrome está descontinuando extensões em manifest V2; em navegadores modernos prefira a 0.9.0.
 
 ## Aviso médico
 
@@ -55,11 +57,6 @@ Ao compartilhar, indique: *"CopyLab, de Vinícius Nathan – MED UVV"* e o link 
 ## Contato e contribuições
 
 Sugestões e relatos de erro: abra uma **Issue** (sem dados de pacientes).
-Para pedir autorização de uso diferente do previsto na licença: perfil do autor em https://github.com/viniciusnathanadv-eng/
-
-viniciusnathanadv@gmail.com 
-
-@viniciusnathancp
+Para pedir autorização de uso diferente do previsto na licença: perfil do autor em https://github.com/SEU-USUARIO
 
 © 2026 Vinícius Nathan – MED UVV. Todos os direitos reservados, exceto os concedidos na licença.
-
