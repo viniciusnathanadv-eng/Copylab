@@ -1,0 +1,22 @@
+COPYLAB (v0.9.2) – Hermes Pardini, Pretti, Prestlab, Diagnóstico do Brasil e Biomega; modo "colar texto" como alternativa
+
+VERSÃO PARA NAVEGADORES ATUAIS (Chrome, Edge, Brave… com manifest V3).
+Se o seu navegador for antigo (ex.: Cent Browser 4.x, Chromium 86), use a pasta "extensao-exames-antigo".
+
+INSTALAÇÃO / ATUALIZAÇÃO
+1) Descompacte e SUBSTITUA a pasta antiga por esta (a pasta "lib" mudou).
+2) cent://extensions (ou chrome://extensions, edge://extensions) > "Modo do desenvolvedor" >
+   "Carregar sem compactação" (ou, se já instalada, clique em "Recarregar").
+3) Em Opções: "Restaurar padrão" + "Salvar" para atualizar o dicionário.
+4) PDF salvo no computador (file://): nos "Detalhes" da extensão, ative
+   "Permitir acesso a URLs de arquivo".
+5) Abra o laudo, clique no ícone: ela lê, copia e mostra o texto. Ctrl+V na prescrição.
+
+URINA / UROCULTURA / PARASITOLÓGICO (formato padrão):
+  EAS (DENS 1.013, PH 6.0, HB 0.06, ...)  -> densidade, pH e só os itens alterados
+  UROC Klebsiella pneumoniae >100.000 UFC/mL (I: cefuroxima; demais S)  ou  UROC sem crescimento
+  EPF negativo
+
+
+SE O LEITOR DE PDF NÃO FUNCIONAR NO SEU NAVEGADOR:
+  No PDF aperte Ctrl+A e Ctrl+C; abra o CopyLab, clique em "Colar texto do PDF" e cole (Ctrl+V). O resultado é copiado automaticamente.
