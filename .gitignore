@@ -1,5 +1,0 @@
-# Nunca publique laudos reais: contêm dados de pacientes (LGPD / sigilo médico)
-*.pdf
-*.zip
-.DS_Store
-Thumbs.db
