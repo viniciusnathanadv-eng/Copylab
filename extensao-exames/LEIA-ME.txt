@@ -1,7 +1,7 @@
-COPYLAB (v0.9.1) – Hermes Pardini, Pretti, Prestlab e Diagnóstico do Brasil; modo "colar texto" como alternativa
+COPYLAB (v0.9.2) – Hermes Pardini, Pretti, Prestlab, Diagnóstico do Brasil e Biomega; modo "colar texto" como alternativa
 
-VERSÃO PARA NAVEGADORES ATUAIS (Chrome, Edge, Brave… com manifest V3).
-Se o seu navegador for antigo (ex.: Cent Browser 4.x, Chromium 86), use a pasta "extensao-exames-antigo".
+VERSÃO PARA NAVEGADORES ANTIGOS (Cent Browser 4.x, Chromium 86 a ~137, manifest V2).
+O Chrome e o Edge atuais NÃO carregam esta versão; neles use a pasta "extensao-exames".
 
 INSTALAÇÃO / ATUALIZAÇÃO
 1) Descompacte e SUBSTITUA a pasta antiga por esta (a pasta "lib" mudou).

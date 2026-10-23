@@ -9,7 +9,7 @@ const CREDITO = 'Criado por Vinícius Nathan – MED UVV';
 // dentro de exames com vários resultados (hemograma, perfil lipídico).
 // "@multi" lista os exames com vários resultados, lidos linha a linha.
 const DEFAULT_DICT = `@multi = Hemograma | Perfil Lipídico | Bilirrubinas | Gasometria | Coagulograma
-@urina = Urina Rotina | Urina Tipo 1 | Urina Tipo I | EAS | Sumário de Urina
+@urina = Urina Rotina | Urina Tipo 1 | Urina Tipo I | Urina I | Urina 1 | EAS | Sumário de Urina
 @urocultura = Urocultura
 @parasito = Parasitológico | Parasitológico de Fezes | EPF
 Hm = Hemácias
@@ -21,6 +21,7 @@ CHCM = CHCM | M.C.H.C
 RDW = RDW
 Leuco = Leucócitos - Global | Leucócitos Totais | Leucócitos
 Bast = Neutrófilos Bastonetes | Bastonetes
+Neut = Neutrófilos
 Seg = Neutrófilos Segmentados | Segmentados
 Linf = Linfócitos
 Mono = Monócitos
@@ -33,7 +34,7 @@ Mielo = Mielócitos
 Meta = Metamielócitos
 Glic = Glicose | Glicemia
 HbA1c = Hemoglobina Glicada
-GME = Glicemia Média Estimada
+GME = Glicemia Média Estimada | Glicose Média Estimada
 Ur = Ureia | Uréia
 Cr = Creatinina
 TFG = Ritmo de Filtração Glomerular | Taxa de Filtração Glomerular
@@ -83,12 +84,13 @@ PTH = Paratormônio | PTH
 T3 = T3 Total
 T3L = T3 Livre
 B12 = Vitamina B12
-VitD = 25-Hidroxivitamina D | Vitamina D
+VitD = 25-Hidroxivitamina D | Hidroxivitamina D 25 | Hidroxivitamina D | Vitamina D
 VitC = Vitamina C
 VitA = Vitamina A
 SOF = Sangue Oculto
 CaI = Cálcio Iônico
 Lac = Lactato
+Trop = Troponina
 pH = pH
 PCO2 = pCO2
 PO2 = pO2
@@ -102,6 +104,25 @@ INR = Razão Normalizada Internacional - RNI | RNI | INR
 TTPA = Tempo de Tromboplastina - TTPA | Tempo de Tromboplastina | TTPA`;
 
 const DEFAULT_SEP = ' | ';
+// Versão do dicionário: quando sobe, os nomes novos são ACRESCENTADOS ao dicionário que você já salvou (sem apagar suas edições)
+const DICT_VERSION = 2;
+
+function mergeDict(userText, defText) {
+  const lines = userText.split('\n');
+  const idx = new Map();
+  lines.forEach((l, i) => { const t = l.trim(); const j = t.indexOf('='); if (t && !t.startsWith('#') && j > 0) idx.set(t.slice(0, j).trim().toLowerCase(), i); });
+  const add = [];
+  for (const e of parseDict(defText)) {
+    const k = e.abbr.toLowerCase();
+    if (!idx.has(k)) { add.push(e.abbr + ' = ' + e.names.join(' | ')); continue; }
+    const i = idx.get(k), j = lines[i].indexOf('=');
+    const have = lines[i].slice(j + 1).split('|').map(x => x.trim()).filter(Boolean);
+    const lower = new Set(have.map(x => x.toLowerCase()));
+    const extra = e.names.filter(n => !lower.has(n.toLowerCase()));
+    if (extra.length) lines[i] = lines[i].replace(/\s+$/, '') + ' | ' + extra.join(' | ');
+  }
+  return lines.join('\n').replace(/\s+$/, '') + (add.length ? '\n' + add.join('\n') : '');
+}
 
 function parseDict(text) {
   const entries = [];
@@ -117,6 +138,11 @@ function parseDict(text) {
 }
 
 // ============ Leitura do PDF ============
+// Alguns laudos (ex.: Biomega) imprimem os rótulos com letras espaçadas: "H e m á c i a s", "R E S U L T A D O".
+function despace(line) {
+  return line.replace(/(?<![\p{L}\p{N}])\p{L}(?: \p{L})+(?![\p{L}\p{N}])/gu, m => m.replace(/ /g, ''));
+}
+
 async function extractLines(buf) {
   const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
   const lines = [];
@@ -135,7 +161,7 @@ async function extractLines(buf) {
     rows.sort((a, b) => b.y - a.y);
     for (const r of rows) {
       r.items.sort((a, b) => a.x - b.x);
-      lines.push(r.items.map(i => i.s).join(' ').replace(/\s+/g, ' ').trim());
+      lines.push(despace(r.items.map(i => i.s).join(' ').replace(/\s+/g, ' ').trim()));
     }
   }
   return lines;
@@ -197,6 +223,7 @@ function cleanNumber(tok) {
 }
 
 function resultValue(rest) {
+  rest = rest.split(/-{3,}/)[0]; // "--- ---" = colunas de resultados anteriores; o que vem depois é referência
   const nums = numbersIn(rest);
   let n = null;
   for (let k = 0; k < nums.length; k++) {
@@ -219,7 +246,10 @@ function resultValue(rest) {
   return m ? m[1].toLowerCase() : null;
 }
 
-const DIFF = new Set(['Bast', 'Seg', 'Linf', 'Mono', 'Eos', 'Baso', 'Blast', 'Prom', 'Mielo', 'Meta']);
+// 8610 -> "8.610" (contagens absolutas por uL, como nos outros laudos)
+function fmtAbs(x) { return /^\d{4,}$/.test(x) ? x.replace(/\B(?=(\d{3})+$)/g, '.') : x; }
+
+const DIFF = new Set(['Bast', 'Neut', 'Seg', 'Linf', 'Mono', 'Eos', 'Baso', 'Blast', 'Prom', 'Mielo', 'Meta']);
 const IMMATURE = new Set(['Blast', 'Prom', 'Mielo', 'Meta']); // omitidos quando zerados
 const KEEPPCT = new Set(['AP', 'SatO2']); // mantêm o símbolo %
 
@@ -235,7 +265,17 @@ function parseMulti(lines, aliases, push, colonOptional = false) {
     const m = seg.slice(a.end).match(colonOptional ? /^(-?[\s:.…]*)(?=[<>]?-?\s*\d)(.*)$/ : /^(\s*:\s*)(.*)$/);
     if (!m) return;
     if (prev && !/\.\./.test(m[1])) return; // em "Resultado anterior" só vale linha com pontilhado (ex.: contagem de plaquetas)
-    const parts = m[2].split(/\s-\s/); // lipídico: dois resultados na mesma linha
+    let body = m[2].split(/\s*-{3,}/)[0]; // corta resultados anteriores/referência (layout Biomega)
+    // Escala "x10³/uL": Leucócitos e Plaquetas viram contagem absoluta (8,61 x10³/uL -> 8.610)
+    const sc = body.match(/x\s*1\s*0\s*(\d)\s*\/\s*[uµ]L/i);
+    body = body.replace(/x\s*1\s*0\s*\d\s*\/\s*[uµ]L/ig, ' ').replace(/\s+/g, ' ').trim();
+    if (sc && +sc[1] === 3 && (a.abbr === 'Leuco' || a.abbr === 'Plaq')) {
+      const ns = numbersIn(body);
+      if (ns.length >= 2 && /^\s*[uµ]L/i.test(body.slice(ns[1].index + ns[1].len))) push(a.abbr, fmtAbs(cleanNumber(ns[1].raw)), src);
+      else if (ns.length) push(a.abbr, fmtAbs(String(Math.round(numOf(ns[0].raw) * 1000))), src);
+      return;
+    }
+    const parts = body.split(/\s-\s/); // lipídico: dois resultados na mesma linha
     let valStr = parts[0];
     const cut = valStr.search(/[✂|]/);
     if (cut >= 0) valStr = valStr.slice(0, cut);
@@ -247,7 +287,7 @@ function parseMulti(lines, aliases, push, colonOptional = false) {
     }
     if (vals.length) {
       const nums = vals.slice(0, 2);
-      const v = nums.map(n => (n.neg ? '-' : '') + cleanNumber(n.raw));
+      const v = nums.map(n => (n.neg ? '-' : '') + (/^[uµ]L/i.test(valStr.slice(n.index + n.len).trim()) ? fmtAbs(cleanNumber(n.raw)) : cleanNumber(n.raw)));
       const zero = nums.every(n => parseFloat(cleanNumber(n.raw)) === 0);
       if (!(IMMATURE.has(a.abbr) && zero)) {
         const one = (KEEPPCT.has(a.abbr) && vals[0].pct) ? v[0] + '%' : v[0];
@@ -273,7 +313,7 @@ const URINE_ITEMS = [
   ['CIL PAT', ['Cilindros Patológicos']], ['CIL', ['Cilindros']], ['CRISTAIS', ['Cristais']], ['FLORA', ['Flora Bacteriana']],
 ];
 const URINE_ALIASES = buildAliases(URINE_ITEMS.map(([abbr, names]) => ({ abbr, names })));
-const NORMAL_WORDS = /^(negativos?|ausentes?|ausencia|normal|claro|limpido|amarel[oa]|amareloclaro|citrino|raras?|naoforamobservadosnestaamostra)$/;
+const NORMAL_WORDS = /^(negativos?|ausentes?|ausencia|normal|claro|limpido|amarel[oa]|amareloclaro|amarelocitrino|citrino|raras?|indetectavel|naoforamobservadosnestaamostra)$/;
 const REF_WORDS = /\s+(amarelo|l[ií]mpido|normal|ausentes?|negativo|rara\(s\))\s*$/i;
 
 function numOf(raw) { // "0,06" -> 0.06 ; "25.000" -> 25000
@@ -284,14 +324,18 @@ function numOf(raw) { // "0,06" -> 0.06 ; "25.000" -> 25000
 // Urina rotina: DENS e PH sempre; os demais itens só quando alterados (fora do normal / acima do limite do laudo)
 function parseUrina(lines, push) {
   const items = [];
-  for (const line of lines) {
+  for (const rawLine of lines) {
+    // layout "NOME valor --- --- referência" (Biomega): separa a referência
+    const dm = rawLine.search(/\s-{3,}/);
+    const dashed = dm >= 0;
+    const line = dashed ? rawLine.slice(0, dm) + ' ✂ ' + rawLine.slice(dm).replace(/-{3,}/g, ' ') : rawLine;
     const parts = line.split(/[✂|]/);
     let ref = parts.slice(1).join(' ');
     const a = findAlias(parts[0], URINE_ALIASES);
     if (!a) continue;
     const rest = parts[0].slice(a.end).replace(/^\s*\)/, ''); // "REAÇÃO (PH)": o nome termina antes do ")"
     const sep = rest.match(/^[\s.:…]*/)[0];
-    if (!/[:.…]/.test(sep)) continue; // exige ":" ou pontilhado depois do nome do item
+    if (!dashed && !/[:.…]/.test(sep)) continue; // exige ":" ou pontilhado depois do nome do item (ou a linha tracejada do layout Biomega)
     let val = rest.slice(sep.length).trim();
     if (!val) continue;
     const mAte = val.match(/(^|\s)(até|ate)\s.*$/i); // referência na mesma linha: "Até 7.000/ml"
@@ -301,10 +345,10 @@ function parseUrina(lines, push) {
       if (/^</.test(val)) continue; // "< 1,0" = dentro do normal
       const v = resultValue(val);
       if (v === null) continue;
-      if (a.abbr === 'DENS') { items.push('DENS ' + v); continue; }
+      if (a.abbr === 'DENS') { items.push('DENS ' + (/^10\d\d$/.test(v) ? '1.' + v.slice(1) : v)); continue; }
       if (a.abbr === 'PH') { items.push('PH ' + v); continue; }
       const n = numOf(numbersIn(val)[0].raw);
-      const lim = ref.match(/(?:<|até|ate|menor que)[^\d]*?(\d[\d.,]*)/i);
+      const lim = ref.match(/(?:<|até|ate|menor que|inferior a)[^\d]*?(\d[\d.,]*)/i);
       const limit = lim ? numOf(lim[1]) : 0;
       if (n > limit) items.push(a.abbr + ' ' + (/por\s*campo/i.test(val) ? v + '/C' : v));
       continue;
@@ -314,6 +358,7 @@ function parseUrina(lines, push) {
     const stripped = val.replace(REF_WORDS, '').trim();
     if (stripped) val = stripped; // tira a referência que veio colada na mesma linha
     if (NORMAL_WORDS.test(skel(val, 'strip').sk)) continue;
+    if (/^(inferior|menor)\s+(a|que)\b/i.test(val)) continue; // "Inferior a 10000" = dentro do normal
     if (/n[aã]o\s+se\s+aplica/i.test(ref)) continue;
     items.push(a.abbr + ' ' + val.toUpperCase());
   }
@@ -392,10 +437,28 @@ function parseParasito(lines, push) {
     if (/^\s*(valor|valores)\s+de\s+refer|este\s+laudo/i.test(lines[k])) break;
     buf.push(lines[k]);
   }
-  const text = buf.join(' ').replace(/^\s*resultado\s*:?\s*/i, '').replace(/\s+/g, ' ').trim();
+  const text = buf.join(' ').replace(/^\s*resultado\s*:?\s*/i, '').replace(/\s+/g, ' ').split(/-{3,}/)[0].trim();
   if (!text) return;
-  if (/n[aã]o\s+foram\s+encontrad/i.test(text)) push('EPF', 'negativo', buf[0]);
+  if (/n[aã]o\s+foram\s+encontrad/i.test(text) || /^negativo\b/i.test(text)) push('EPF', 'negativo', buf[0]);
   else push('EPF', text.length > 110 ? text.slice(0, 107) + '...' : text, buf[0]);
+}
+
+// Teste rápido COVID-19: "CORONAVÍRUS IGG NEGATIVO" / "CORONAVÍRUS IGM INCONCLUSIVO"
+function parseCovid(lines, push) {
+  for (const l of lines) {
+    const m = l.match(/coronav[ií]rus\s+(ig[gm])\s+(negativo|positivo|reagente|n[aã]o\s+reagente|inconclusivo|indeterminado)/i);
+    if (m) push('COVID ' + m[1].toUpperCase(), m[2].toLowerCase(), l);
+  }
+}
+
+// Curva glicêmica (TOTG): "Glicemia 0 71 mg/dL", "Glicemia 60 58 mg/dL", "Glicemia 120 65 mg/dL"
+function parseTotg(lines, push) {
+  const pts = [];
+  for (const l of lines) {
+    const m = l.match(/^\s*glicemia\s+(\d{1,3})\s+(\d+(?:[.,]\d+)?)/i);
+    if (m) pts.push(m[1] + "' " + cleanNumber(m[2]));
+  }
+  if (pts.length) push('TOTG', '(' + pts.join(', ') + ')', lines.find(l => /^\s*glicemia/i.test(l)) || '');
 }
 
 function parseResults(lines, entries) {
@@ -411,9 +474,12 @@ function parseResults(lines, entries) {
   const blocks = [];
   let cur = null, hasA = false;
   for (let i = 0; i < lines.length; i++) {
-    const L = lines[i], n1 = lines[i + 1] || '', n2 = lines[i + 2] || '';
+    const L = lines[i];
+    const isHdr = l => /^\s*(resultados?\s+anteriores|valores?\s+de\s+refer)/i.test(l); // cabeçalhos de coluna (Biomega) entre o título e "Material:"
+    const k = isHdr(lines[i + 1] || '') ? 2 : 1;
+    const n1 = lines[i + k] || '', n2 = lines[i + k + 1] || '';
     const isA = /^\s*\[\s*data\s+da\s+coleta/i.test(n1);
-    const titleOk = L.trim() && !isMeta(L) && !isMetodo(L) && (isMeta(n1) || (isMetodo(n1) && isMeta(n2)));
+    const titleOk = L.trim() && !isMeta(L) && !isMetodo(L) && !isHdr(L) && (isMeta(n1) || (isMetodo(n1) && isMeta(n2)));
     if (titleOk) {
       if (isA) hasA = true;
       cur = { start: i, title: L, style: isA ? 'A' : 'B', lines: [] };
@@ -432,6 +498,8 @@ function parseResults(lines, entries) {
     if (findAlias(b.title, spUrina)) { parseUrina(b.lines, push); return; }
     if (findAlias(b.title, spUro)) { parseUrocultura(b.lines, push); return; }
     if (findAlias(b.title, spPar)) { parseParasito(b.lines, push); return; }
+    if (/covid|coronav/i.test(b.title)) { parseCovid(b.lines, push); return; }
+    if (/toler[aâ]ncia.*glicose|^\s*totg/i.test(b.title)) { parseTotg(b.lines, push); return; }
     if (findAlias(b.title, multiTitles)) { parseMulti(b.lines, aliases, push, b.style !== 'A'); return; }
     const t = findAlias(b.title, aliases);
     if (!t) return; // exame fora do dicionário
@@ -454,7 +522,17 @@ function parseResults(lines, entries) {
         const dotted = rem.match(/^\s*[.…]{2,}\s*(?=[<>]?-?\s*\d)(.*)$/);   // "Calcio Ionico.......... 1,17 mmol/L" (sem linha "Resultado")
         if (same) { const v = resultValue(same[1]); if (v !== null) push(a.abbr, v, line); }
         else if (dotted) { const v = resultValue(dotted[1]); if (v !== null) push(a.abbr, v, line); }
+        else if (/---/.test(line) && /^\s*(?:-\s*(?:\d\s){1,2}(?=\d)|[:\s]*)(?=[<>]?\d)/.test(rem)) { // linha "NOME valor --- ---" (Biomega): ex. "Glicose Média Estimada 117 mg/dL", "VITAMINA D - 2 5 28,7"
+          const v = resultValue(rem.replace(/^\s*-\s*(?:\d\s){1,2}(?=\d)/, ' ')); if (v !== null) push(a.abbr, v, line);
+        }
         else if (!/[\p{L}\p{N}]/u.test(rem)) { label = a.abbr; awaiting = false; } // sub-título; o RESULTADO vem na linha seguinte
+      }
+    }
+    if (label) { // nenhuma linha "Resultado": usa a 1ª linha "texto valor unidade" depois do cabeçalho (ex.: CK-MB do Biomega)
+      for (const line of b.lines) {
+        if (/^\s*(material|m.{1,2}todo|valor|resultados?\s+anteriores|assinado|nota|obs)/i.test(line)) continue;
+        const m = line.split(/-{3,}/)[0].match(/^[^\d:<>]{4,}?\s+([<>]?\d[\d.,]*)\s*(?:[A-Za-zµ%\/]{1,10})?\s*$/);
+        if (m) { const v = resultValue(m[1]); if (v !== null) { push(label, v, line); break; } }
       }
     }
   }
@@ -484,6 +562,8 @@ function extractDate(lines) {
     'data\\/hora\\s+coleta\\s*:?\\s*' + D,               // Pretti (por exame)
     'data\\s+da\\s+entrada\\s*:?\\s*' + D,               // Prestlab (cabeçalho)
     'data\\s+de\\s+coleta[.\\s:]*' + D,                  // Prestlab (por exame)
+    'data\\s+coleta\\s*:?\\s*' + D,                   // Biomega (Prefeitura do Rio)
+    'cadastro\\s*:?\\s*' + D,                          // Biomega (quando não há data de coleta)
     'data\\s+e\\s+hor.{1,2}rio\\s+da\\s+libera.{1,3}o[.\\s:]*' + D,
     'data\\s+de\\s+libera.{1,3}o[.\\s:]*' + D,
   ].map(p => new RegExp(p, 'i'));

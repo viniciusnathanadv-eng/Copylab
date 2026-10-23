@@ -6,7 +6,15 @@ const $ = id => document.getElementById(id);
 const chromiumMajor = () => { const m = navigator.userAgent.match(/Chrome\/(\d+)/); return m ? +m[1] : 0; };
 const browserInfo = () => 'Chromium ' + (chromiumMajor() || '?');
 const setStatus = (t, cls) => { $('status').textContent = t; $('status').className = cls || ''; };
-const getCfg = () => storageGet({ dict: DEFAULT_DICT, sep: DEFAULT_SEP, debug: false });
+// Lê as opções. Se o dicionário salvo é de uma versão antiga, acrescenta os nomes novos sem apagar as suas edições.
+async function getCfg() {
+  const c = await storageGet({ dict: DEFAULT_DICT, sep: DEFAULT_SEP, debug: false, dictVer: 0 });
+  if (c.dictVer !== DICT_VERSION) {
+    c.dict = mergeDict(c.dict, DEFAULT_DICT); c.dictVer = DICT_VERSION;
+    try { await storageSet({ dict: c.dict, dictVer: DICT_VERSION }); } catch (e) { /* segue com o dicionário em memória */ }
+  }
+  return c;
+}
 
 $('credito').textContent = CREDITO;
 $('opts').onclick = e => { e.preventDefault(); chrome.runtime.openOptionsPage(); };
@@ -31,7 +39,7 @@ async function showResults(lines, cfg) {
 // Modo alternativo: texto copiado do PDF (Ctrl+A, Ctrl+C) e colado aqui — funciona em qualquer navegador
 async function fromPaste() {
   try {
-    const lines = $('paste').value.split(/\r?\n/).map(l => l.replace(/[\u00a0\t]+/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const lines = $('paste').value.split(/\r?\n/).map(l => despace(l.replace(/[\u00a0\t]+/g, ' ').replace(/\s+/g, ' ').trim())).filter(Boolean);
     await showResults(lines, await getCfg());
   } catch (e) {
     setStatus(e && e.message ? e.message : String(e), 'err');

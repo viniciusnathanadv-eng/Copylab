@@ -2,10 +2,10 @@
 // Proibido remover este aviso e os créditos da interface, vender ou publicar versões modificadas sem autorização por escrito.
 document.getElementById('credito').textContent = CREDITO;
 const $ = id => document.getElementById(id);
-storageGet({ dict: DEFAULT_DICT, sep: DEFAULT_SEP, debug: false }).then(c => { $('dict').value = c.dict; $('sep').value = c.sep; $('debug').checked = c.debug; });
+storageGet({ dict: DEFAULT_DICT, sep: DEFAULT_SEP, debug: false, dictVer: 0 }).then(c => { if (c.dictVer !== DICT_VERSION) c.dict = mergeDict(c.dict, DEFAULT_DICT); $('dict').value = c.dict; $('sep').value = c.sep; $('debug').checked = c.debug; });
 $('save').onclick = async () => {
   try {
-    await storageSet({ dict: $('dict').value, sep: $('sep').value, debug: $('debug').checked });
+    await storageSet({ dict: $('dict').value, sep: $('sep').value, debug: $('debug').checked, dictVer: DICT_VERSION });
     $('msg').textContent = 'Salvo.';
   } catch (e) { $('msg').textContent = 'Erro ao salvar: ' + e.message; }
 };
