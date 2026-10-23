@@ -57,6 +57,7 @@ Ao compartilhar, indique: *"CopyLab, de Vinícius Nathan – MED UVV"* e o link 
 ## Contato e contribuições
 
 Sugestões e relatos de erro: abra uma **Issue** (sem dados de pacientes).
-Para pedir autorização de uso diferente do previsto na licença: perfil do autor em https://github.com/SEU-USUARIO
-
+Para pedir autorização de uso diferente do previsto na licença: perfil do autor em https://github.com/viniciusnathanadv-eng/
+viniciusnathanadv@gmail.com
+@viniciusnathancp
 © 2026 Vinícius Nathan – MED UVV. Todos os direitos reservados, exceto os concedidos na licença.
