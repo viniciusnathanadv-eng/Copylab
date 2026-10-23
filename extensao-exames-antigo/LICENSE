@@ -1,0 +1,60 @@
+LICENÇA COPYLAB – USO LIVRE, COM ATRIBUIÇÃO, SEM FINS COMERCIAIS
+CopyLab Source-Available License (pt-BR) v1.0
+
+Copyright © 2026 Vinícius Nathan – MED UVV. Todos os direitos reservados,
+exceto os expressamente concedidos abaixo.
+
+Resumo em inglês: free to use and to share unmodified, with credit; no selling,
+no removal of credits, no publishing of modified versions without written
+permission. Provided "as is", with no warranty. Not a medical device.
+
+1. O QUE VOCÊ PODE FAZER (gratuitamente)
+   a) Usar o CopyLab para fins pessoais, profissionais, clínicos, de ensino e de
+      pesquisa, inclusive dentro de hospitais, clínicas e instituições de ensino,
+      desde que o software em si não seja cobrado de ninguém.
+   b) Copiar e redistribuir o CopyLab SEM MODIFICAÇÕES, de forma gratuita,
+      mantendo este arquivo (LICENSE), o README e os créditos do autor.
+   c) Modificar uma cópia para uso próprio e privado (por exemplo, ajustar o
+      dicionário de abreviações nas Opções ou adaptar para o seu laboratório),
+      sem publicá-la nem distribuí-la.
+
+2. O QUE VOCÊ NÃO PODE FAZER sem autorização prévia e por escrito do autor
+   a) Vender, alugar, sublicenciar ou cobrar de qualquer forma pelo CopyLab ou
+      por versões derivadas, nem incluí-lo em produto ou serviço pago.
+   b) Remover, ocultar ou alterar o nome do autor, os avisos de direitos autorais,
+      esta licença ou o crédito exibido na interface da extensão.
+   c) Apresentar o CopyLab, ou parte dele, como de sua própria autoria.
+   d) Publicar ou distribuir versões modificadas (forks, "versões melhoradas",
+      republicação em lojas de extensões ou repositórios), mesmo gratuitas.
+   e) Usar o nome "CopyLab" ou o nome do autor de modo que sugira aprovação,
+      parceria ou vínculo oficial.
+   Para pedir autorização (colaborações, versões institucionais, contribuições de
+   código), entre em contato com o autor pelo perfil indicado no README.
+
+3. COMPONENTES DE TERCEIROS
+   A pasta "extensao-exames/lib" contém o PDF.js (Mozilla Foundation), licenciado
+   sob Apache License 2.0 (ver lib/LICENSE-pdfjs.txt). Esta licença NÃO se aplica a
+   esse componente, que segue os termos próprios da sua licença.
+
+4. AVISO MÉDICO E DE DADOS
+   O CopyLab é uma ferramenta de apoio à transcrição e NÃO é dispositivo médico.
+   Ele pode errar ou deixar de reconhecer exames. O profissional de saúde é o único
+   responsável por conferir todo resultado contra o laudo original antes de
+   utilizá-lo em prontuário ou prescrição. O processamento dos PDFs ocorre
+   localmente no navegador; o autor não recebe nem armazena dados de pacientes.
+   Quem usa a ferramenta é responsável por cumprir a LGPD e o sigilo médico.
+
+5. SEM GARANTIA E LIMITAÇÃO DE RESPONSABILIDADE
+   O SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIA DE QUALQUER
+   TIPO, EXPRESSA OU IMPLÍCITA, INCLUSIVE DE ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA
+   OU DE AUSÊNCIA DE ERROS. NA MEDIDA PERMITIDA PELA LEI, O AUTOR NÃO RESPONDE POR
+   DANOS DECORRENTES DO USO OU DA IMPOSSIBILIDADE DE USO DO SOFTWARE.
+
+6. VIGÊNCIA E VIOLAÇÃO
+   Os direitos concedidos aqui terminam automaticamente se você descumprir qualquer
+   condição desta licença. A tolerância do autor com um descumprimento não
+   significa renúncia a seus direitos.
+
+7. LEI APLICÁVEL
+   Esta licença é regida pela legislação brasileira, em especial a Lei nº 9.610/1998
+   (Direitos Autorais) e a Lei nº 9.609/1998 (Programa de Computador).

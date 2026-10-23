@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- CopyLab © 2026 Vinícius Nathan – MED UVV. Uso livre com atribuição, sem fins comerciais; veja LICENSE. -->
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>Opções – CopyLab</title>
+<style>
+  body { max-width: 640px; margin: 24px auto; font: 14px system-ui, sans-serif; }
+  textarea { width: 100%; height: 360px; font: 13px ui-monospace, monospace; box-sizing: border-box; }
+  input { width: 120px; font: 13px ui-monospace, monospace; }
+  button { padding: 6px 12px; margin-right: 8px; cursor: pointer; }
+</style></head>
+<body>
+  <h2>Dicionário de abreviações</h2>
+  <p>Uma por linha: <code>ABREVIAÇÃO = nome1 | nome2</code>. Linhas com # são ignoradas.</p>
+  <textarea id="dict" spellcheck="false"></textarea>
+  <p>Separador entre resultados: <input id="sep"> (ex.: <code> | </code> ou <code>, </code>)</p>
+  <p><label><input type="checkbox" id="debug"> Mostrar o "Texto lido do PDF" no popup (depuração; exibe nome e dados do paciente)</label></p>
+  <button id="save">Salvar</button><button id="reset">Restaurar padrão</button><span id="msg"></span>
+  <p id="credito" style="margin-top:32px;color:#666;font-size:12px"></p>
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body></html>

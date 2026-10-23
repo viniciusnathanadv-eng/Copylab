@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- CopyLab © 2026 Vinícius Nathan – MED UVV. Uso livre com atribuição, sem fins comerciais; veja LICENSE. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+  body { width: 360px; margin: 0; padding: 12px; font: 13px system-ui, sans-serif; }
+  #status { margin-bottom: 8px; font-weight: 600; }
+  .ok { color: #1a7f37; } .err { color: #b3261e; }
+  textarea { width: 100%; box-sizing: border-box; height: 90px; font: 13px ui-monospace, monospace; }
+  button { margin-top: 8px; padding: 6px 12px; cursor: pointer; }
+  details { margin-top: 10px; } pre { max-height: 160px; overflow: auto; white-space: pre-wrap; font-size: 11px; }
+  a { font-size: 12px; }
+  .hint { font-size: 12px; color: #444; margin: 8px 0 4px; }
+  #credito { margin-top: 10px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 11px; color: #666; text-align: center; }
+</style>
+</head>
+<body>
+  <div id="status">Lendo o exame…</div>
+  <textarea id="out" spellcheck="false"></textarea>
+  <div><button id="copy">Copiar de novo</button> <a href="#" id="opts">Opções</a> &nbsp; <a href="#" id="pastelink">Colar texto do PDF</a></div>
+  <div id="pastebox" hidden>
+    <p class="hint">Alternativa (funciona em qualquer navegador): no PDF, aperte <b>Ctrl+A</b> e <b>Ctrl+C</b>; depois cole aqui com <b>Ctrl+V</b>.</p>
+    <textarea id="paste" placeholder="Cole aqui o texto do PDF (Ctrl+V)" spellcheck="false"></textarea>
+    <button id="convert">Converter</button>
+  </div>
+  <details><summary>Conferência: de onde veio cada valor</summary><pre id="src"></pre></details>
+  <details id="rawbox" hidden><summary>Texto lido do PDF (para depuração)</summary><pre id="raw"></pre></details>
+  <div id="credito"></div>
+  <script src="common.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
